@@ -20,6 +20,7 @@
     "firebase-admin": "^11.11.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "react-router-dom": "^6.16.0"
   }
 }
