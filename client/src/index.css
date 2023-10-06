@@ -28,6 +28,11 @@
   border-bottom: 2px solid black;
 }
 
+#nav-link1.active {
+  border-bottom: 0 solid black;
+  color: #777;
+}
+
 .navbar-brand {
   font-weight: 700;
   font-family: "roboto", sans-serif;
