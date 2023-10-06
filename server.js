@@ -2,15 +2,17 @@ import express from 'express';
 import colors from 'colors';
 import dotenv from 'dotenv';
 import {} from './DB/firebase.js';
-import { db } from './DB/firestore.js';
-// import { create } from './DB/FCRUD.js';
 import authRoutes from './routes/authRoute.js';
+import cors from 'cors';
+
 //configure env
 dotenv.config();
 
 //rest object
 const app = express();
 
+//middlewares
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
