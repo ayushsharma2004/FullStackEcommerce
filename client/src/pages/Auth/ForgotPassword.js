@@ -1,35 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './../../components/Layout/Layout';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import '../../styles/AuthStyles.css';
-import { useAuth } from '../../context/auth';
 
-const Login = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [answer, setAnswer] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
-  const [auth, setAuth] = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   //form submit function
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API}/api/v1/auth/login`,
-        { email, password }
+        `${process.env.REACT_APP_API}/api/v1/auth/forgot-password`,
+        { email, newPassword, answer }
       );
       if (res && res.data.success) {
         toast.success(res.data.message, { duration: 3000 });
-        setAuth({
-          ...auth,
-          user: res.data.user,
-          token: res.data.token,
-        });
-        localStorage.setItem('auth', JSON.stringify(res.data));
         setIsRegistered(true); // Registration successful
       } else {
         toast.error(res.data.message);
@@ -43,15 +35,14 @@ const Login = () => {
   // Use a useEffect to navigate and show toast after registration
   useEffect(() => {
     if (isRegistered) {
-      navigate(location.state || '/');
+      navigate('/login');
       // toast.success('Registration successful!', { duration: 3000 });
     }
-  }, [isRegistered, navigate, location]);
-
+  }, [isRegistered, navigate]);
   return (
-    <Layout title={'Login - Ecommerce Website'}>
+    <Layout>
       <div className="form-container">
-        <h1>Login Page</h1>
+        <h1>Forgot Password</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <input
@@ -68,30 +59,32 @@ const Login = () => {
           </div>
           <div className="mb-3">
             <input
-              type="password"
-              value={password}
+              type="text"
+              value={answer}
               onChange={(e) => {
-                setPassword(e.target.value);
+                setAnswer(e.target.value);
               }}
               className="form-control"
-              id="exampleInputPassword1"
-              placeholder="Enter your Password"
+              id="exampleInputAnswer1"
+              placeholder="Enter your pet name?"
               required
             />
           </div>
           <div className="mb-3">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => {
-                navigate('/forgot-password');
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => {
+                setNewPassword(e.target.value);
               }}
-            >
-              Forgot Password
-            </button>
+              className="form-control"
+              id="exampleInputPassword1"
+              placeholder="Enter your new Password"
+              required
+            />
           </div>
           <button type="submit" className="btn btn-primary">
-            Login
+            Reset
           </button>
         </form>
       </div>
@@ -99,4 +92,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

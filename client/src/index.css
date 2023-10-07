@@ -30,7 +30,7 @@
 
 #nav-link1.active {
   border-bottom: 0 solid black;
-  color: #777;
+  /* color: #777; */
 }
 
 .navbar-brand {
