@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './../../components/Layout/Layout';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import '../../styles/AuthStyles.css';
 import { useAuth } from '../../context/auth';
@@ -12,6 +12,7 @@ const Login = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [auth, setAuth] = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   //form submit function
   const handleSubmit = async (e) => {
@@ -42,10 +43,10 @@ const Login = () => {
   // Use a useEffect to navigate and show toast after registration
   useEffect(() => {
     if (isRegistered) {
-      navigate('/');
+      navigate(location.state || '/');
       // toast.success('Registration successful!', { duration: 3000 });
     }
-  }, [isRegistered, navigate]);
+  }, [isRegistered, navigate, location]);
 
   return (
     <Layout title={'Login - Ecommerce Website'}>
