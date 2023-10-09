@@ -50,8 +50,6 @@ export const registerController = async (req, res) => {
     const userId = email; // Use email as the document ID
 
     if (typeof hashedPassword !== 'string') {
-      console.log(typeof hashedPassword);
-      console.log(hashedPassword);
       return res.status(500).send({
         success: false,
         message: 'Error in registration: Invalid password',

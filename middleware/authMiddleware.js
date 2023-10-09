@@ -3,7 +3,6 @@ import { db } from '../DB/firestore.js';
 
 export const requireSignIn = async (req, res, next) => {
   try {
-    console.log('requireSignin');
     const token = req.headers.authorization; // Get the token from the request headers
     if (!token) {
       return res.status(401).json({
@@ -14,7 +13,6 @@ export const requireSignIn = async (req, res, next) => {
 
     const decode = JWT.verify(token, process.env.JWT_token);
     req.user = decode;
-    console.log(decode);
     next();
   } catch (error) {
     console.log(error);
@@ -24,18 +22,15 @@ export const requireSignIn = async (req, res, next) => {
 //admin access
 export const isAdmin = async (req, res, next) => {
   try {
-    console.log('isAdmin');
     const userRef = db.collection(process.env.collectionName).doc(req.user._id);
     const response = await userRef.get();
     const user = response.data();
-    console.log(user);
     if (user.role !== 1) {
       return res.status(401).send({
         success: false,
         message: 'Unauthorized Access',
       });
     } else {
-      console.log('else');
       next();
     }
   } catch (error) {
