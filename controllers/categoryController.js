@@ -127,6 +127,12 @@ export const deleteCategoryController = async (req, res) => {
   try {
     const { id } = req.params;
     const docRef = db.collection(process.env.collectionCategory).doc(id);
+    if (!docRef) {
+      return res.status(404).send({
+        success: true,
+        message: 'No such category exists',
+      });
+    }
     await docRef.delete();
     res.status(201).send({
       success: true,
