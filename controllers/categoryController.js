@@ -31,7 +31,7 @@ export const createCategoryController = async (req, res) => {
     };
     const category = await db
       .collection(process.env.collectionCategory)
-      .doc(name)
+      .doc(slugify(name))
       .set(categoryJson);
     res.status(201).send({
       success: true,
@@ -127,16 +127,24 @@ export const deleteCategoryController = async (req, res) => {
   try {
     const { id } = req.params;
     const docRef = db.collection(process.env.collectionCategory).doc(id);
-    if (!docRef) {
+
+    //validate
+    const doc = await docRef.get();
+    if (!doc.exists) {
       return res.status(404).send({
-        success: true,
+        success: false,
         message: 'No such category exists',
       });
     }
+
+    //delete
     await docRef.delete();
+    console.log(docRef._converter);
     res.status(201).send({
       success: true,
       message: 'Category Deleted Successfully',
+      docRef: docRef,
+      id: docRef._converter,
     });
   } catch (error) {
     console.log(error);
