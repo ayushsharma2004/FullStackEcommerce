@@ -31,7 +31,7 @@ export const createCategoryController = async (req, res) => {
     };
     const category = await db
       .collection(process.env.collectionCategory)
-      .doc(slugify(name))
+      .doc(name)
       .set(categoryJson);
     res.status(201).send({
       success: true,
@@ -85,7 +85,7 @@ export const categoryController = async (req, res) => {
     res.status(201).send({
       success: true,
       message: 'All Categories List',
-      category: category,
+      category,
     });
   } catch (error) {
     console.log(error);

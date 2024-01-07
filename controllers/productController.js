@@ -44,10 +44,7 @@ export const createProductController = async (req, res) => {
       };
     }
 
-    await db
-      .collection(process.env.collectionProduct)
-      .doc(slugify(name))
-      .set(products);
+    await db.collection(process.env.collectionProduct).doc(name).set(products);
     res.status(201).send({
       success: true,
       message: 'New Product created',
