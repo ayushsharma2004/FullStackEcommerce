@@ -30,6 +30,7 @@ export const createProductController = async (req, res) => {
     // Create Products
     const products = {
       ...req.fields,
+      price: parseInt(price),
       slug: slugify(name),
     };
 
@@ -77,7 +78,7 @@ export const updateProductController = async (req, res) => {
     const { name, description, price, category, quantity, shipping } =
       req.fields;
     const { photo } = req.files;
-
+    var photoData = {};
     //validation
     switch (true) {
       case !name:
@@ -96,26 +97,34 @@ export const updateProductController = async (req, res) => {
           .send({ error: 'photo is Required and should be less then 1mb' });
     }
 
-    const docRef = db
+    const querySnapshot = await db
       .collection(process.env.collectionProduct)
-      .doc(req.params.pid);
+      .where('slug', '==', req.params.slug)
+      .get();
 
-    //update product
-    const product = await docRef.update(
-      { ...req.fields, slug: slugify(name) },
-      { new: true }
-    );
 
     // Check if the 'photo' property exists in the 'products' object
     if (photo) {
       // Read file data as a Buffer
       const fileData = fs.readFileSync(photo.path);
       // Include relevant file information in 'products'
-      product.photo = {
+      photoData.photo = {
         data: fileData,
         contentType: photo.type,
       };
     }
+
+    // Update each document in the query results
+    var product;
+    querySnapshot.forEach((doc) => {
+      const updateData = { ...req.fields, slug: slugify(name) };
+      if (photoData.photo) {
+        updateData.photo = photoData.photo;
+      }
+      product = doc.ref.update(updateData);
+    });
+
+    //update product
     res.status(201).send({
       success: true,
       message: 'Product updated',
@@ -213,13 +222,17 @@ export const getSingleProductController = async (req, res) => {
 
 export const productPhotoController = async (req, res) => {
   try {
-    const docSnapshot = await db
+    const querySnapshot = await db
       .collection(process.env.collectionProduct)
-      .doc(req.params.pid)
+      .where('slug', '==', req.params.slug)
       .get();
+    var docSnapshot;
+    querySnapshot.forEach((doc) => {
+      docSnapshot = doc.data();
+    })
 
-    if (docSnapshot.exists) {
-      const { photo } = docSnapshot.data();
+    if (docSnapshot) {
+      const { photo } = docSnapshot;
       if (photo.data) {
         res.set('Content-type', photo.contentType);
         return res.status(200).send(photo.data);
@@ -237,26 +250,31 @@ export const productPhotoController = async (req, res) => {
 
 export const deleteProductController = async (req, res) => {
   try {
-    const docRef = db
+    console.log(req.params.slug);
+    const querySnapshot = await db
       .collection(process.env.collectionProduct)
-      .doc(req.params.pid);
-
+      .where('slug', '==', req.params.slug)
+      .get();
     //validate
-    const doc = await docRef.get();
-    if (!doc.exists) {
+    if (!querySnapshot) {
       return res.status(404).send({
         success: false,
         message: 'No such product exists',
       });
     }
 
-    //delete
-    await docRef.delete();
+    // Read and Delete each document in the query results
+    var docSnapshot;
+    querySnapshot.forEach((doc) => {
+      docSnapshot = doc.data();
+      doc.ref.delete();
+    });
+
     res.status(201).send({
       success: true,
       message: 'Product Deleted Successfully',
-      docRef: docRef,
-      id: docRef._converter,
+      docRef: docSnapshot,
+      id: req.params.slug,
     });
   } catch (error) {
     console.log(error);
@@ -264,6 +282,85 @@ export const deleteProductController = async (req, res) => {
       success: false,
       message: 'Error while deleting product',
       error: error,
+    });
+  }
+};
+
+// filters
+export const productFiltersController = async (req, res) => {
+  try {
+    //checked = [id1, id2, ...]
+    //price = [p1, p2]
+    const { checked, radio } = req.body;
+    let query = db.collection(process.env.collectionProduct);
+    if (checked.length > 0) {
+      query = query.where('category', 'in', checked);
+    }
+    if (radio.length > 0) {
+      query = query.where('price', '>=', radio[0]).where('price', '<=', radio[1]);
+    }
+    const snapshot = await query.get();
+    const products = [];
+    snapshot.forEach((doc) => {
+      products.push(doc.data());
+    });
+    res.status(200).send({
+      success: true,
+      products
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({
+      success: false,
+      message: "Error WHile Filtering Products",
+      error,
+    });
+  }
+};
+
+// product count
+export const productCountController = async (req, res) => {
+  try {
+    const snapshot = await db.collection(process.env.collectionProduct).get();
+    const total = snapshot.size;
+    res.status(200).send({
+      success: true,
+      total,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({
+      message: "Error in product count",
+      error,
+      success: false,
+    });
+  }
+};
+
+// product list base on page
+export const productListController = async (req, res) => {
+  try {
+    const perPage = 4;
+    const page = req.params.page ? parseInt(req.params.page) : 1;
+    const snapshot = await db.collection(process.env.collectionProduct)
+      .orderBy('price', 'asc')
+      .offset((page - 1) * perPage)
+      .limit(perPage)
+      .get();
+    const products = [];
+    snapshot.forEach((doc) => {
+      products.push(doc.data());
+    });
+    res.status(200).send({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({
+      success: false,
+      message: "error in per page ctrl",
+      error,
     });
   }
 };

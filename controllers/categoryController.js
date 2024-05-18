@@ -37,6 +37,7 @@ export const createCategoryController = async (req, res) => {
       success: true,
       message: 'New category created',
       category: category,
+      categoryJson: categoryJson,
     });
   } catch (error) {
     console.log(error);
@@ -96,6 +97,7 @@ export const categoryController = async (req, res) => {
     });
   }
 };
+
 export const SingleCategoryController = async (req, res) => {
   try {
     const slug = req.params.slug;
@@ -144,7 +146,7 @@ export const deleteCategoryController = async (req, res) => {
       success: true,
       message: 'Category Deleted Successfully',
       docRef: docRef,
-      id: docRef._converter,
+      id: id,
     });
   } catch (error) {
     console.log(error);

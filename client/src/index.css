@@ -38,18 +38,19 @@
   font-family: "roboto", sans-serif;
   letter-spacing: 3px;
 }
+
 /* =============================
 ==========footer============= */
 
 .footer {
   color: white;
   padding: 25px;
-  background: #000000; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #434343,
-    #000000
-  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: #000000;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right,
+      #434343,
+      #000000);
+  /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(to right, #434343, #000000);
 }
 
@@ -63,6 +64,7 @@
   color: #ffefba;
   border-bottom: 1px solid #ffefba;
 }
+
 /* =================================
 ======== page not found css ======= */
 .pnf {
@@ -89,10 +91,12 @@
   padding: 10px;
   margin-top: 10px;
 }
+
 .pnf-btn:hover {
   background-color: black;
   color: white;
 }
+
 /* ========================================= */
 /* =========contact us ========= */
 .contactus {
@@ -102,4 +106,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.product-link {
+  text-decoration: none;
+  color: black !important;
 }
